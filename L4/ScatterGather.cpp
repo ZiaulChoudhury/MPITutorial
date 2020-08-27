@@ -11,7 +11,6 @@ void swap(int *xp, int *yp)
     *yp = temp;  
 }  
   
-// A function to implement bubble sort  
 void bubbleSort(int arr[], int n)  
 {  
     int i, j;  
@@ -31,31 +30,25 @@ int main(int argc, char* argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     enum role_ranks { SENDER, RECEIVER }; 
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-   
-    if(rank == 0) {
-    	int bufferUnsorted[100];
-	int bufferSorted[100];
+    int sendSize = 100;
+    int chunkSize = 10;
+    int recvBuffer[10];
+    int bufferUnsorted[100]; 
+    int bufferSorted[100];
+ 
+    if(rank == 0){ 
 	for(int i=0;i<100;i++)
 		bufferUnsorted[i] = int(rand()%101) + 1;
-	for(int i=1;i<11;i++)
-		MPI_Send(bufferUnsorted+10*(i-1),10,MPI_INT,i,0,MPI_COMM_WORLD);
-	for(int i=1;i<11;i++)
-            	MPI_Recv(bufferSorted+10*(i-1), 10, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-	printf(" Un Sorted \n");
-	for(int i=0;i<10;i++)
-		printf(" %d ", bufferUnsorted[i+20]);	
-	printf("\n Sorted \n");	
-	for(int i=0;i<10;i++)
-		printf(" %d ", bufferSorted[i+20]);
     }
-    else {
-	    int received[10];
-            MPI_Recv(received, 10, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	    bubbleSort(received,10);
-	    MPI_Send(received, 10, MPI_INT, 0, 0, MPI_COMM_WORLD);
+    MPI_Scatter(bufferUnsorted,chunkSize,MPI_INT,recvBuffer,chunkSize,MPI_INT,0,MPI_COMM_WORLD);
+    if(rank != 0){
+	bubbleSort(recvBuffer,10);
+	printf("\n");
+	for(int i=0;i<10; i ++)
+		printf("%d ", recvBuffer[i]);
+	printf("\n");
     }
-    	 
+	
     MPI_Finalize(); 
     return EXIT_SUCCESS;
 }

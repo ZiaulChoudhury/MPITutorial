@@ -1,17 +1,7 @@
-/**
- * @author RookieHPC
- * @brief Original source code at https://www.rookiehpc.com/mpi/docs/mpi_send.php
- **/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
  
-/**
- * @brief Illustrates how to send a message in a blocking fashion.
- * @details This program is meant to be run with 2 processes: a sender and a
- * receiver.
- **/
 int main(int argc, char* argv[])
 {
     MPI_Init(&argc, &argv); 
